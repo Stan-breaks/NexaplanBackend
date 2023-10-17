@@ -28,3 +28,12 @@ class Projects(models.Model):
     projectTask=models.ManyToManyField(Task,blank=False,related_name='project_tasks')
     projectStatus=models.BooleanField(default=True)
     timestamp=models.DateTimeField(auto_now_add=True)
+    
+    def serialize(self):
+        return{
+            'user':self.user,
+            'projectName':self.projectName,
+            'projectTask':self.projectTask,
+            'projectStatus':self.projectStatus,
+            'timestamp':self.timestamp,
+        }
