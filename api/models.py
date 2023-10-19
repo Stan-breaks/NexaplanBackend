@@ -12,7 +12,7 @@ class Task(models.Model):
     dueDate=models.DateField()
     def serialize(self):
         return{
-            'user':self.user,
+            'user':self.user.username,
             'taskName':self.taskName,
             'taskDescription':self.taskDescription,
             'isPriority':self.isPriority,
@@ -31,7 +31,7 @@ class Projects(models.Model):
     
     def serialize(self):
         return{
-            'user':self.user,
+            'user':self.user.userName,
             'projectName':self.projectName,
             'projectTask':self.projectTask,
             'projectStatus':self.projectStatus,

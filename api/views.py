@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate,get_user_model
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.core.exceptions import ObjectDoesNotExist
 # Create your views here.
 
 def index(request):
@@ -49,6 +50,7 @@ def login(request):
     else:
         return JsonResponse({'message': 'Invalid request method'})
 
+@csrf_exempt
 def taskList(request):
     if request.method=='POST':
         data=json.loads(request.body)
@@ -57,15 +59,26 @@ def taskList(request):
         taskDescription=data['taskDescription']
         dueDate=data['dueDate']
         isPriority=data['isPriority']
-        user=request.user
-        task=Task.objects.create(taskName,taskDescription,dueDate,isPriority,user)
+        done=data["done"]
+        userName=data["user"]
+        User=get_user_model()
+        try:
+            user = User.objects.get(username=userName)
+        except ObjectDoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        task = Task.objects.create(taskName=taskName,taskDescription=taskDescription,dueDate=dueDate,isPriority=isPriority,user=user,done=done)
         task.save()
+        return JsonResponse({'message':'add task success'})
     else:
         tasks=Task.objects.all()
         tasks=tasks.order_by("-timestamp").all()
         return JsonResponse([task.serialize() for task in tasks],safe=False)
 
 def projectList(request):
-    projects=Projects.objects.all()
-    projects=projects.order_by("-timestamp").all()
-    return JsonResponse([project.serialize()for project in projects],safe=False)
+    if request.method=='POST':
+        data=json.loads(request.body)
+
+    else:
+        projects=Projects.objects.all()
+        projects=projects.order_by("-timestamp").all()
+        return JsonResponse([project.serialize()for project in projects],safe=False)
