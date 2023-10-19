@@ -10,17 +10,18 @@ import json
 def index(request):
     return render(request,'api/index.html')
 
+@csrf_exempt
 def register(request):
     data=json.loads(request.body)
 
     userName=data['userName']
     email=data['email']
     password=data['password']
-    
+
     try:
         user=User.objects.create_user(userName,email,password)
         user.save()
-        return JsonResponse({'message':'register success'})
+        return JsonResponse({'message':'register success','user':userName})
     except IntegrityError:
         return JsonResponse({'message':'Account already exist'})
 
@@ -39,7 +40,7 @@ def login(request):
             user = authenticate(request, username=user.username, password=password)
             
             if user is not None:
-                return JsonResponse({'message': 'login success'})
+                return JsonResponse({'message': 'login success','user':user.username})
             else:
                 return JsonResponse({'message': 'login failure'})
                 
