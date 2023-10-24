@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import Task,Projects,User
 from django.http import JsonResponse
-from django.contrib.auth import authenticate,get_user_model
+from django.contrib.auth import authenticate,get_user_model,login,logout
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -28,7 +28,7 @@ def register(request):
 
 @csrf_exempt
 def login(request):
-    if request.method=='POST':
+    if request.method =='POST':
         data = json.loads(request.body)
         email=data['email']
         password=data['password']
@@ -41,6 +41,7 @@ def login(request):
             user = authenticate(request, username=user.username, password=password)
             
             if user is not None:
+                # login(user)
                 return JsonResponse({'message': 'login success','user':user.username})
             else:
                 return JsonResponse({'message': 'login failure'})
@@ -54,7 +55,6 @@ def login(request):
 def taskList(request):
     if request.method=='POST':
         data=json.loads(request.body)
-
         taskName=data['taskName']
         taskDescription=data['taskDescription']
         dueDate=data['dueDate']
@@ -70,7 +70,10 @@ def taskList(request):
         task.save()
         return JsonResponse({'message':'add task success'})
     else:
-        tasks=Task.objects.all()
+        userName=request.GET.get('user')
+        User=get_user_model()
+        user=User.objects.get(username=userName)
+        tasks = Task.objects.filter(user=user)
         tasks=tasks.order_by("-timestamp").all()
         return JsonResponse([task.serialize() for task in tasks],safe=False)
 

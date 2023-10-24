@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import uuid
 
 # Create your models here.
 class Task(models.Model):
@@ -12,6 +13,7 @@ class Task(models.Model):
     dueDate=models.DateField()
     def serialize(self):
         return{
+            'id':self.id,
             'user':self.user.username,
             'taskName':self.taskName,
             'taskDescription':self.taskDescription,
