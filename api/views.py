@@ -82,6 +82,18 @@ def taskView(request):
     task=Task.objects.get(id=taskId)
     return JsonResponse(task.serialize())
 
+@csrf_exempt
+def completeTask(request,taskId):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        task = Task.objects.get(id=taskId)
+        task.done = True
+        task.save()
+        return JsonResponse({'status': 'success'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+    
+
 def projectList(request):
     if request.method=='POST':
         data=json.loads(request.body)

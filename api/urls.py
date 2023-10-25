@@ -8,4 +8,5 @@ urlpatterns=[
     path("taskList",views.taskList,name="taskList"),
     path("taskView",views.taskView,name="taskView"),
     path("projectList",views.projectList,name="projectList"),
+    path("completeTask/<int:taskId>",views.completeTask,name="completeTask")
 ]
