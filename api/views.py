@@ -92,7 +92,16 @@ def completeTask(request,taskId):
         return JsonResponse({'status': 'success'}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
-    
+
+@csrf_exempt
+def deleteTask(request,taskId):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        task = Task.objects.get(id=taskId)
+        task.delete()
+        return JsonResponse({'status':'success'},status=200)
+    else:
+        return JsonResponse({'error':'Invalid request'},status=400)  
 
 def projectList(request):
     if request.method=='POST':
