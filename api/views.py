@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Task,Projects,User
+from .models import Task,Project,User
 from django.http import JsonResponse
 from django.contrib.auth import authenticate,get_user_model,login,logout
 from django.db import IntegrityError
@@ -82,6 +82,6 @@ def projectList(request):
         data=json.loads(request.body)
 
     else:
-        projects=Projects.objects.all()
+        projects=Project.objects.all()
         projects=projects.order_by("-timestamp").all()
         return JsonResponse([project.serialize()for project in projects],safe=False)

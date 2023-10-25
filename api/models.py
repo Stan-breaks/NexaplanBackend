@@ -24,7 +24,7 @@ class Task(models.Model):
         }
 
 
-class Projects(models.Model):
+class Project(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="project_user")
     projectName=models.CharField(max_length=200)
     projectTask=models.ManyToManyField(Task,blank=False,related_name='project_tasks')
