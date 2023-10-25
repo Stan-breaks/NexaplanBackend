@@ -77,6 +77,11 @@ def taskList(request):
         tasks=tasks.order_by("-timestamp").all()
         return JsonResponse([task.serialize() for task in tasks],safe=False)
 
+def taskView(request):
+    taskId=request.GET.get('id')
+    task=Task.objects.get(id=taskId)
+    return JsonResponse(task.serialize())
+
 def projectList(request):
     if request.method=='POST':
         data=json.loads(request.body)
