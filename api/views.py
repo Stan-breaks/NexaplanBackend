@@ -106,8 +106,11 @@ def deleteTask(request,taskId):
 def projectList(request):
     if request.method=='POST':
         data=json.loads(request.body)
-
+    
     else:
-        projects=Project.objects.all()
+        userName=request.GET.get('user')
+        User=get_user_model()
+        user=User.objects.get(username=userName)
+        projects=Project.objects.filter(user=user)
         projects=projects.order_by("-timestamp").all()
         return JsonResponse([project.serialize()for project in projects],safe=False)
