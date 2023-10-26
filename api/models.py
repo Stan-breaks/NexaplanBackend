@@ -29,6 +29,7 @@ class Project(models.Model):
     projectName=models.CharField(max_length=200)
     projectDescription=models.CharField(max_length=200,default='description')
     projectTask=models.ManyToManyField(Task,related_name='project_tasks')
+    collaborators=models.ManyToManyField(User,related_name='collaborators')
     projectStatus=models.BooleanField(default=True)
     timestamp=models.DateTimeField(auto_now_add=True)
     
@@ -39,6 +40,7 @@ class Project(models.Model):
             'projectName':self.projectName,
             'projectDescription':self.projectDescription,
             'projectTask':[task.taskName for task in self.projectTask.all()],
+            'collaborators':[collaborator.username for collaborator in self.collaborators.all()],
             'projectStatus':self.projectStatus,
             'timestamp':self.timestamp,
         }

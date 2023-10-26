@@ -120,3 +120,18 @@ def projectList(request):
         projects=Project.objects.filter(user=user)
         projects=projects.order_by("-timestamp").all()
         return JsonResponse([project.serialize()for project in projects],safe=False)
+    
+def dashboard(request):
+    userName=request.GET.get('user')
+    User=get_user_model()
+    user=User.objects.get(username=userName)
+    totalTasks=Task.objects.filter(user=user).count()
+    totalProjects=Project.objects.filter(user=user).count()
+    completedTasks=Task.objects.filter(user=user,done=True).count()
+    pendingTasks=Task.objects.filter(user=user,done=False).count()
+    activeProjects=Project.objects.filter(user=user,projectStatus=True).count()
+    return JsonResponse({'totalTasks':totalTasks,'completedTasks':completedTasks,'pendingTasks':pendingTasks,'totalProjects':totalProjects,'activeProjects':activeProjects},safe=False)
+
+def projectView(request,projectId):
+    project=Project.objects.get(id=projectId)
+    return JsonResponse(project.serialize(),safe=False)
