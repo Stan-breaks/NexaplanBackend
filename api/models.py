@@ -27,15 +27,18 @@ class Task(models.Model):
 class Project(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="project_user")
     projectName=models.CharField(max_length=200)
-    projectTask=models.ManyToManyField(Task,blank=False,related_name='project_tasks')
+    projectDescription=models.CharField(max_length=200,default='description')
+    projectTask=models.ManyToManyField(Task,related_name='project_tasks')
     projectStatus=models.BooleanField(default=True)
     timestamp=models.DateTimeField(auto_now_add=True)
     
     def serialize(self):
         return{
-            'user':self.user.userName,
+            'id':self.id,
+            'user':self.user.username,
             'projectName':self.projectName,
-            'projectTask':self.projectTask,
+            'projectDescription':self.projectDescription,
+            'projectTask':[task.taskName for task in self.projectTask.all()],
             'projectStatus':self.projectStatus,
             'timestamp':self.timestamp,
         }

@@ -34,14 +34,9 @@ def login(request):
         password=data['password']
         User = get_user_model()
         try:
-            # Get the user with the given email
             user = User.objects.get(email=email)
-            
-            # Authenticate the user
             user = authenticate(request, username=user.username, password=password)
-            
             if user is not None:
-                # login(user)
                 return JsonResponse({'message': 'login success','user':user.username})
             else:
                 return JsonResponse({'message': 'login failure'})
@@ -103,10 +98,21 @@ def deleteTask(request,taskId):
     else:
         return JsonResponse({'error':'Invalid request'},status=400)  
 
+@csrf_exempt
 def projectList(request):
     if request.method=='POST':
         data=json.loads(request.body)
-    
+        projectName=data["name"]
+        projectDescription=data["description"]
+        userName=data["user"]
+        User=get_user_model()
+        try:
+           user=User.objects.get(username=userName)
+        except ObjectDoesNotExist:
+            return JsonResponse({'error':'user not found'},status=400)
+        project=Project.objects.create(projectName=projectName,projectDescription=projectDescription,user=user)
+        project.save()
+        return JsonResponse({'message':'project added successfully'})
     else:
         userName=request.GET.get('user')
         User=get_user_model()
