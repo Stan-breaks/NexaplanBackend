@@ -6,6 +6,7 @@ from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.core.exceptions import ObjectDoesNotExist
+from django.core import serializers
 # Create your views here.
 
 def index(request):
@@ -135,3 +136,9 @@ def dashboard(request):
 def projectView(request,projectId):
     project=Project.objects.get(id=projectId)
     return JsonResponse(project.serialize(),safe=False)
+
+def usersList(request):
+    User=get_user_model()
+    users=User.objects.all()
+    usernames = [user.username for user in users]
+    return JsonResponse(usernames,safe=False)
