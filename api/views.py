@@ -138,7 +138,35 @@ def projectView(request,projectId):
     return JsonResponse(project.serialize(),safe=False)
 
 def usersList(request):
+    if request.method=='POST':
+        data=json.loads(request.body)
+        userName=data['userName']
+        
     User=get_user_model()
     users=User.objects.all()
     usernames = [user.username for user in users]
     return JsonResponse(usernames,safe=False)
+
+@csrf_exempt
+def projectTasks(request,projectId):
+    if request.method=='POST':
+        data=json.loads(request.body)
+        taskName=data['taskName']
+        taskDescription=data['taskDescription']
+        assignedTo=data['assignedTo']
+        dueDate=data['dueDate']
+        isPriority=data['isPriority']
+        done=data["done"]
+        projectId=data["projectId"]
+
+        project=Project.objects.get(id=projectId)
+        User=get_user_model()
+        try:
+            user=User.objects.get(username=assignedTo)
+        except ObjectDoesNotExist:
+            return JsonResponse({'error':'user not found'},status=400)
+        
+        task=Task.objects.create(taskName=taskName,user=user,taskDescription=taskDescription,dueDate=dueDate,isPriority=isPriority,project=project,done=done)
+        task.save()
+        project.projectTasks.add(task)
+        return JsonResponse({'message':'add task success'})
