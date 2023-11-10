@@ -12,5 +12,7 @@ urlpatterns=[
     path("completeTask/<int:taskId>",views.completeTask,name="completeTask"),
     path("deleteTask/<int:taskId>",views.deleteTask,name="deleteTask"),
     path("dashboard",views.dashboard,name="dashboard"),
-    path("usersList",views.usersList,name="usersList")
+    path("usersList/<int:projectId>",views.usersList,name="usersList"),
+    path("projectCollaborators/<int:projectId>",views.projectCollaborators,name="projectCollaborators"),
+    path("projectTasks/<int:projectId>",views.projectTasks,name="projectTasks"),
 ]
