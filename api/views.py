@@ -145,7 +145,7 @@ def usersList(request,projectId):
     usernames = [user.username for user in users]
     usernames=list(filter(lambda x: x!=userName,usernames))
     return JsonResponse(usernames,safe=False)
-
+ 
 @csrf_exempt
 def projectTasks(request,projectId):
     if request.method=='POST':
@@ -156,8 +156,6 @@ def projectTasks(request,projectId):
         dueDate=data['dueDate']
         isPriority=data['priority']
         
-
-
         project=Project.objects.get(id=projectId)
         User=get_user_model()
         try:
