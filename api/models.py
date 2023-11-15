@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-import uuid
+
 
 # Create your models here.
 class Task(models.Model):
@@ -11,6 +11,7 @@ class Task(models.Model):
     done=models.BooleanField(default=False)
     timestamp=models.DateField(auto_now_add=True)
     dueDate=models.DateField()
+    category=models.CharField(max_length=200,default='category')
     def serialize(self):
         return{
             'id':self.id,
@@ -21,9 +22,16 @@ class Task(models.Model):
             'done':self.done,
             'timestamp':self.timestamp.strftime('%b %d %Y, %I:%M %p'),
             'dueDate':self.dueDate.strftime('%b %d %Y, %I:%M %p'),
+            'category':self.category
         }
 
 
+class Comment(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="comment_user")
+    text = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
 class Project(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="project_user")
     projectName=models.CharField(max_length=200)
@@ -32,7 +40,7 @@ class Project(models.Model):
     collaborators=models.ManyToManyField(User,related_name='collaborators')
     projectStatus=models.BooleanField(default=True)
     timestamp=models.DateTimeField(auto_now_add=True)
-    
+    comments=models.ManyToManyField(Comment,related_name='comments')
     def serialize(self):
         return{
             'id':self.id,
@@ -44,3 +52,4 @@ class Project(models.Model):
             'projectStatus':self.projectStatus,
             'timestamp':self.timestamp,
         }
+    

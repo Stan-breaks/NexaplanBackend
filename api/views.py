@@ -122,6 +122,12 @@ def projectList(request):
         projects=projects.order_by("-timestamp").all()
         return JsonResponse([project.serialize()for project in projects],safe=False)
     
+def collaboratorsProjectList(request):
+    userName=request.GET.get('user')
+    projects=Project.objects.filter(collaborators__username__contains=userName)
+    projects=projects.order_by("-timestamp").all()
+    return JsonResponse([project.serialize() for project in projects],safe=False)
+
 def dashboard(request):
     userName=request.GET.get('user')
     User=get_user_model()
