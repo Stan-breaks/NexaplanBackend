@@ -12,6 +12,7 @@ class Task(models.Model):
     timestamp=models.DateField(auto_now_add=True)
     dueDate=models.DateField()
     category=models.CharField(max_length=200,default='category')
+    hasProject=models.BooleanField(default=False)
     def serialize(self):
         return{
             'id':self.id,
@@ -31,7 +32,8 @@ class Comment(models.Model):
         User, on_delete=models.CASCADE, related_name="comment_user")
     text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
-    
+
+
 class Project(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="project_user")
     projectName=models.CharField(max_length=200)

@@ -56,13 +56,14 @@ def taskList(request):
         dueDate=data['dueDate']
         isPriority=data['isPriority']
         done=data["done"]
+        category=data["category"]
         userName=data["user"]
         User=get_user_model()
         try:
             user = User.objects.get(username=userName)
         except ObjectDoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
-        task = Task.objects.create(taskName=taskName,taskDescription=taskDescription,dueDate=dueDate,isPriority=isPriority,user=user,done=done)
+        task = Task.objects.create(taskName=taskName,taskDescription=taskDescription,dueDate=dueDate,isPriority=isPriority,user=user,done=done,category=category)
         task.save()
         return JsonResponse({'message':'add task success'})
     else:
@@ -98,6 +99,33 @@ def deleteTask(request,taskId):
         return JsonResponse({'status':'success'},status=200)
     else:
         return JsonResponse({'error':'Invalid request'},status=400)  
+
+def taskCategories(request):
+    userName=request.GET.get('user')
+    category=request.GET.get('category')
+    User=get_user_model()
+    user=User.objects.get(username=userName)
+    tasks=Task.objects.filter(user=user,category=category)
+    tasks=tasks.order_by("-timestamp").all()
+    return JsonResponse([task.serialize() for task in tasks],safe=False)
+
+def categoryList(request):
+    userName=request.GET.get('user')
+    label=request.GET.get('label')
+    User=get_user_model()
+    user=User.objects.get(username=userName)
+    if label=='project':
+        tasks = Task.objects.filter(user=user,hasProject=True)
+        tasks = tasks.order_by("-timestamp").all()
+        categories = [task.category for task in tasks]
+        categories = list(set(categories))
+        return JsonResponse(categories, safe=False)
+    else:
+        tasks = Task.objects.filter(user=user,hasProject=False)
+        tasks = tasks.order_by("-timestamp").all()
+        categories = [task.category for task in tasks]
+        categories = list(set(categories))
+        return JsonResponse(categories, safe=False) 
 
 @csrf_exempt
 def projectList(request):
@@ -161,7 +189,7 @@ def projectTasks(request,projectId):
         assignedTo=data['assignedTo']
         dueDate=data['dueDate']
         isPriority=data['priority']
-        
+        category=data['category']        
         project=Project.objects.get(id=projectId)
         User=get_user_model()
         try:
@@ -169,10 +197,11 @@ def projectTasks(request,projectId):
         except ObjectDoesNotExist:
             return JsonResponse({'error':'user not found'},status=400)
         
-        task=Task.objects.create(taskName=taskName,user=user,taskDescription=taskDescription,dueDate=dueDate,isPriority=isPriority)
+        task=Task.objects.create(taskName=taskName,user=user,taskDescription=taskDescription,dueDate=dueDate,isPriority=isPriority,category=category,hasProject=True)
         task.save()
         project.projectTask.add(task)
         return JsonResponse({'message':'add task success'})     
+
 
 @csrf_exempt
 def projectCollaborators(request,projectId):
