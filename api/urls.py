@@ -7,6 +7,7 @@ urlpatterns=[
     path("register",views.register,name="register"),
     path("taskList",views.taskList,name="taskList"),
     path("categoryList",views.categoryList,name="categoryList"),
+    path("taskCategories",views.taskCategories,name="taskCategories"),
     path("taskView",views.taskView,name="taskView"),
     path("projectList",views.projectList,name="projectList"),
     path("collaboratorsProjectList",views.collaboratorsProjectList,name="collaboratorsProjectList"),
