@@ -202,6 +202,15 @@ def projectTasks(request,projectId):
         project.projectTask.add(task)
         return JsonResponse({'message':'add task success'})     
 
+@csrf_exempt
+def projectHandling(request,projectId):
+    if request.method=='POST':
+        project=Project.objects.get(id=projectId)
+        project.projectStatus=(not project.projectStatus)
+        project.save()
+        return JsonResponse({
+            "message":"project status flipped successfully"
+        })
 
 @csrf_exempt
 def projectCollaborators(request,projectId):
@@ -216,3 +225,23 @@ def projectCollaborators(request,projectId):
             return JsonResponse({'error':'user not found'},status=400)
         project.collaborators.add(user)
         return JsonResponse({'message':'add collaborator success'})
+    
+
+def search(request):
+    try:
+        userName = request.GET.get('user')
+        searchText = request.GET.get('search')
+        User = get_user_model()
+        user = User.objects.get(username=userName)
+        tasks = Task.objects.filter(user=user, taskName__icontains=searchText)
+        projects = Project.objects.filter(
+            user=user, projectName__icontains=searchText)
+        return JsonResponse([project.serialize() for project in projects]+[task.serialize() for task in tasks], safe=False)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User does not exist"}, status=404)
+    except Task.DoesNotExist:
+        return JsonResponse({"error": "Task does not exist"}, status=404)
+    except Project.DoesNotExist:
+        return JsonResponse({"error": "Project does not exist"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
