@@ -55,3 +55,14 @@ class Project(models.Model):
             'timestamp':self.timestamp,
         }
     
+class Profile(models.Model):
+    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="profile_user")
+    profilePicture=models.ImageField(upload_to='profile_pictures',blank=True)
+
+    def serialize(self):
+        return{
+            'id':self.id,
+            'user':self.user.username,
+            'profilePicture':self.profilePicture
+        }
+

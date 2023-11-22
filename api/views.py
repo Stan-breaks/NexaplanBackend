@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
+from datetime import datetime
 # Create your views here.
 
 def index(request):
@@ -104,6 +105,11 @@ def taskCategories(request):
     userName=request.GET.get('user')
     category=request.GET.get('category')
     User=get_user_model()
+    if category=='upcoming deadlines':
+        user=User.objects.get(username=userName)
+        tasks=Task.objects.filter(user=user,dueDate__gte=datetime.now())
+        tasks=tasks.order_by("-timestamp").all()
+        return JsonResponse([task.serialize() for task in tasks],safe=False)
     user=User.objects.get(username=userName)
     tasks=Task.objects.filter(user=user,category=category)
     tasks=tasks.order_by("-timestamp").all()
@@ -124,6 +130,7 @@ def categoryList(request):
         tasks = Task.objects.filter(user=user,hasProject=False)
         tasks = tasks.order_by("-timestamp").all()
         categories = [task.category for task in tasks]
+        categories+=['upcoming deadlines']
         categories = list(set(categories))
         return JsonResponse(categories, safe=False) 
 
@@ -156,16 +163,32 @@ def collaboratorsProjectList(request):
     projects=projects.order_by("-timestamp").all()
     return JsonResponse([project.serialize() for project in projects],safe=False)
 
+
 def dashboard(request):
-    userName=request.GET.get('user')
-    User=get_user_model()
-    user=User.objects.get(username=userName)
-    totalTasks=Task.objects.filter(user=user).count()
-    totalProjects=Project.objects.filter(user=user).count()
-    completedTasks=Task.objects.filter(user=user,done=True).count()
-    pendingTasks=Task.objects.filter(user=user,done=False).count()
-    activeProjects=Project.objects.filter(user=user,projectStatus=True).count()
-    return JsonResponse({'totalTasks':totalTasks,'completedTasks':completedTasks,'pendingTasks':pendingTasks,'totalProjects':totalProjects,'activeProjects':activeProjects},safe=False)
+    userName = request.GET.get('user')
+    User = get_user_model()
+    user = User.objects.get(username=userName)
+    totalTasks = Task.objects.filter(user=user).count()
+    totalProjects = Project.objects.filter(user=user).count()
+    completedTasks = Task.objects.filter(user=user, done=True).count()
+    pendingTasks = Task.objects.filter(user=user, done=False).count()
+    activeProjects = Project.objects.filter(
+        user=user, projectStatus=True).count()
+    priorityTasks = Task.objects.filter(user=user, isPriority=True).count()
+    upcomingDeadlines = Task.objects.filter(
+        user=user, dueDate__gte=datetime.now()).count()
+
+
+    return JsonResponse({
+        'totalTasks': totalTasks,
+        'completedTasks': completedTasks,
+        'pendingTasks': pendingTasks,
+        'totalProjects': totalProjects,
+        'activeProjects': activeProjects,
+        'priorityTasks': priorityTasks,
+        'upcomingDeadlines': upcomingDeadlines,
+    }, safe=False)
+
 
 def projectView(request,projectId):
     project=Project.objects.get(id=projectId)
@@ -245,3 +268,38 @@ def search(request):
         return JsonResponse({"error": "Project does not exist"}, status=404)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+@csrf_exempt
+def settings(request):
+    if request.method=='POST':
+        data=json.loads(request.body)
+        userName=request.GET.get('user')
+        User=get_user_model()
+        user=User.objects.get(username=userName)
+        user.username=data['username']
+        user.email=data['email']
+        user.set_password(data['password'])
+        user.save()
+        return JsonResponse({'message':'settings saved successfully'})
+    else:
+        userName=request.GET.get('user')
+        User=get_user_model()
+        user=User.objects.get(username=userName)
+        return JsonResponse({'username':user.username,'email':user.email})
+
+@csrf_exempt 
+def profile(request):
+    if request.method=='POST':
+        data=json.loads(request.body)
+        userName=request.GET.get('user')
+        User=get_user_model()
+        user=User.objects.get(username=userName)
+        user.profilePicture=data['profilePicture']
+        user.save()
+        return JsonResponse({'message':'profile picture saved successfully'})
+    else:
+        userName=request.GET.get('user')
+        User=get_user_model()
+        user=User.objects.get(username=userName)
+        return JsonResponse({'profilePicture':user.profilePicture})
+       

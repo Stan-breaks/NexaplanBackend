@@ -20,4 +20,5 @@ urlpatterns=[
     path("projectCollaborators/<int:projectId>",views.projectCollaborators,name="projectCollaborators"),
     path("projectTasks/<int:projectId>",views.projectTasks,name="projectTasks"),
     path("search",views.search,name="search"),
+    path("settings",views.settings,name="settings"),
 ]
