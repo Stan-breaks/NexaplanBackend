@@ -21,4 +21,5 @@ urlpatterns=[
     path("projectTasks/<int:projectId>",views.projectTasks,name="projectTasks"),
     path("search",views.search,name="search"),
     path("settings",views.settings,name="settings"),
+    path("comments",views.comment,name="comment"),
 ]
