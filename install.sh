@@ -1,2 +1,2 @@
-yum install python3 sqlite3 libsqlite3-dev
+yum install epel-release sqlite-develum python3
 pip install django djangorestframework django-cors-headers
