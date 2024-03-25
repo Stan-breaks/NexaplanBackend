@@ -347,3 +347,4 @@ def profile(request):
 def comment(request):
     id = request.GET.get("id")
     project = Project.objects.get(id=id)
+
