@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure--fc#rh30*j*moz32m2d-ka3(d)mp47zw3h@134g-h!4abvwu(x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["nexaplanbackend.onrender.com"]
 
 
 # Application definition
